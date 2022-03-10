@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" style="background-color: white">
+<div th:replace="fragments/headerPage :: headerPage"></div>
+<link rel="stylesheet"  href="/css/index.css" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+
+<style>
+    .chart_con {
+        margin: 2em 1em 1em 1em;
+        background: aliceblue;
+        border-radius: 5px;
+        padding-top: 1em;
+    }
+    .chart_title{
+        font-size: 1.1em;
+    }
+    .form_chart_main {
+        margin-top: 2em;
+    }
+</style>
+
+<body >
+    <div >
+        <div th:replace="fragments/headerSide :: headerSide"></div>
+
+    </div>
+    <div class="col col-lg-2">
+        <div th:replace="fragments/sidebarPage :: sidebarPage"></div>
+    </div>
+    <div class="col col-lg-10">
+        <div class="layui-card " style="margin-top: 2em">
+            <div class="layui-breadcrumb" lay-filter="breadcrumb">
+                <a lay-href="">Index</a>
+                <a><cite>view nodes</cite></a>
+            </div>
+        </div>
+        <div class="layui-fluid">
+            <div class="layui-card">
+
+
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">all devices</li>
+                        <li>IP pool</li>
+                        <li>MANET</li>
+                        <li>Global IP pool</li>
+                        <li>Membership</li>
+                        <li>Broadcast</li>
+                    </ul>
+                    <div class="layui-tab-content">
+                        <div class="layui-tab-item layui-show">
+                            <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="layadmin-userfront-formlist">
+                                <div class="layui-form-item">
+                                    <div class="layui-inline">
+                                        <input type="text" name="keyword" placeholder="input keyword to query" autocomplete="off" class="layui-input">
+                                    </div>
+                                    <div class="layui-inline">
+                                        <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="LAY-user-front-search">
+                                            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                        </button>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <button class="layui-btn  layui-btn-danger layuiadmin-btn-list" data-type="batchdel">Batch delete</button>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <button class="layui-btn  layuiadmin-btn-list" data-type="newNodes">Create a new node</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <table id="node_table" lay-filter="node_table"></table>
+                            <script type="text/html" id="table-content-com">
+                                {{#  if(d.status =='ACTIVE'){ }}
+                                <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="logout"><i class="layui-icon layui-icon-logout"></i>logout</a>
+                                {{# }else if(d.status == 'OFFLINE'){ }}
+                                <a class="layui-btn  layui-btn-xs" lay-event="login"><i class="layui-icon layui-icon-circle-dot"></i>login</a>
+                                {{# } }}
+                                {{#  if((d.status =='ACTIVE' && d.MANET_SSID =='' )||(d.status =='ACTIVE' &&d.MANET_SSID ==null)){ }}
+                                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="MANET"><i class="layui-icon layui-icon-add-circle"></i>Create</a>
+                                <a class="layui-btn label-default layui-btn-xs" lay-event="Join"><i class="layui-icon layui-icon-add-1 "></i>Join</a>
+                                {{# } if((d.status =='ACTIVE' && d.MANET_SSID !='' )||(d.status =='ACTIVE' &&d.MANET_SSID !=null)) { }}
+                                <a class="layui-btn  layui-btn-primary layui-border-re layui-btn-xs" lay-event="leave">Leave</a>
+                                {{# } }}
+                                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>delete</a>
+                            </script>
+                        </div>
+                        <div class="layui-tab-item"><table id="IP_table" lay-filter="IP_table"></table></div>
+                        <div class="layui-tab-item"><table id="MANET_table" lay-filter="MANET_table"></table></div>
+                        <div class="layui-tab-item"><table id="Global_IP_table" lay-filter="Global_IP_table"></table></div>
+                        <div class="layui-tab-item">
+                            <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+                                <div class="layui-form-item">
+                                    <div class="layui-inline" >
+                                        <div  id="MAENT_select" >
+                                        </div>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <button class="layui-btn layuiadmin-btn-useradmin" lay-submit lay-filter="Membership_table-search">
+                                            <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="Membership_table" lay-filter="Membership_table"></table>
+                        </div>
+                        <div class="layui-tab-item"><table id="Broadcast_table" lay-filter="Broadcast_table"></table></div>
+
+                    </div>
+                </div>
+
+
+<!--                <div class="layui-form" id="formId" style="width: 200px;">-->
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">Manet range</label>-->
+<!--                        <div class="layui-input-block">-->
+<!--                            <select id="range"  name="range" lay-verify="required">-->
+<!--                                <option value="80">80</option>-->
+<!--                                <option value="150">150</option>-->
+<!--                                <option value="200">200</option>-->
+<!--                                <option value="250">250</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">Manet capacity</label>-->
+<!--                        <div class="layui-input-block">-->
+<!--                            <select id="capacity" name="capacity" lay-verify="required">-->
+<!--                                <option value="3">3</option>-->
+<!--                                <option value="5">5</option>-->
+<!--                                <option value="8">8</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+                <style>
+                    .layer-conten-out{
+                        overflow: visible !important;
+                    }
+                    .layui-layer-molv .layui-layer-content{
+                        overflow: visible !important;
+                    }
+
+                    .MANET_range{
+                        border-radius: 50%;
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                    }
+                </style>
+
+
+
+                    <div id="environment" >
+                    <div id="nodeList"></div>
+                    <div id="MANETsList">
+<!--                        <div style="StyleList.pop()_range" ondblclick="showMANETDetail(this)"-->
+<!--                             class="MANET_range" id="item.MANET_SSID">-->
+
+<!--                        </div>-->
+
+<!--                        <div  ondblclick="showNodeDetail(this)" id="id" style="width: fit-content;" >-->
+<!--                            <img  src="/img/p1.png" />-->
+<!--                            <div>item.username</div>-->
+<!--                        </div>-->
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+
+
+</body>
+<div th:replace="fragments/footerPage :: footerPage"></div>
+<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+<script type="text/javascript" src="/js/broadcast.js" th:href="@{/js/broadcast.js}" ></script>
+<!--<link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css">-->
+<script type="text/javascript">
+    var ItemId = "Item2_1";
+    var StyleList = new Array();
+    StyleList.push("background-color: rgba(255,239,97,0.26); border: 1px dotted rgba(114,90,4,0.86);")
+    StyleList.push("background-color: rgba(241,110,110,0.26); border: 1px dotted rgba(219,12,84,0.86);")
+    StyleList.push("background-color: rgba(166,248,87,0.26); border: 1px dotted rgba(4,114,35,0.86);")
+    StyleList.push("background-color: #61e6ff42;border: 1px dotted #046172db ;")
+    LoadMANETsAndNodes();
+    function draggable(id){
+        var fid="#"+id;
+        $(fid).draggable({ containment: "#environment", scroll: false });
+        $(fid).draggable({
+            start: function() {},
+            drag: function() {},
+            stop: function(event, ui) {}
+        });
+    }
+    function draggableNode(id){
+        var fid="#"+id;
+        $(fid).draggable({ containment: "#environment", scroll: false });
+        $(fid).draggable({
+            start: function() {},
+            drag: function() {},
+            stop: function(event, ui) {
+                // for (var i=0;i<MANETsNodes.length;i++){
+                //     var len = 0;
+                //     var n_len = $(fid).offset().left;
+                //     if(MANETsNodes[i].id == fid && MANETsNodes[i].mSSID!=""){
+                //         var m_len = $(MANETsNodes[i].mid).offset().left;
+                //         len = MANETsNodes[i].MANET_range;
+                //         var dis = Math.abs(m_len-n_len);
+                //         if(n_len<m_len) dis = Math.abs(m_len-(n_len-len));
+                //         if(dis>len) {
+                //             var info = 'Node:' + MANETsNodes[i].username + ' is leaving current MANET';
+                //             var jsonData = {};
+                //             jsonData["MANET_SSID"] = MANETsNodes[i].mSSID.replaceAll("#","");
+                //             jsonData["mid"] = "";
+                //             jsonData["username"] = MANETsNodes[i].username;
+                //             var params = JSON.stringify(jsonData);
+                //             var url = "/node/leave"
+                //             ajaxPost(url, params, function (data) {
+                //                 if (data.code == 0) {
+                //                     layer.msg(info, {time: 3000, icon: 1});
+                //                     $("#nodeList").html("");
+                //                     var deleteNode =MANETsNodes[i].mid+" div"+fid
+                //                     $(deleteNode).remove();
+                //                     MANETsNodes = new Array();
+                //                     Update=1;
+                //                     layui.table.reload('node_table'); //重载表格
+                //                 } else {
+                //                     layer.open({title: 'CANNOT LEAVE!', content: data.msg});return;
+                //                 }
+                //             });
+                //         }
+                //         break;
+                //     } else if( MANETsNodes[i].mSSID=="" && MANETsNodes[i].id == fid ){
+                //         for (var j=0;j<MANETsList.length;j++){
+                //             var MANET = MANETsList[j];
+                //             if(MANET.MANET_SSID!="") {
+                //                 var m_len = $("#"+MANET.MANET_SSID).offset().left;
+                //                 var m_top = $("#"+MANET.MANET_SSID).offset().top;
+                //                 var n_top = $(fid).offset().top;
+                //                 len = MANET.MANET_range;
+                //                 console.info($(MANET.MANET_SSID).offset());
+                //                 console.info($(fid).offset());
+                //                 if (n_len < m_len || n_top < m_top || (n_top - m_top > len-10 || n_len - m_len > len -15)) break;
+                //                 info = 'Node:' + MANETsNodes[i].username + ' wants to join MANET:' + MANET.MANET_SSID;
+                //                 var jsonData = {};
+                //                 jsonData["nodeID"] = MANETsNodes[i].id;
+                //                 jsonData["MANET_SSID"] = MANET.MANET_SSID;
+                //                 var params = JSON.stringify(jsonData);
+                //                 var url = "/node/join"
+                //                 ajaxPost(url, params, function (data) {
+                //                     if (data.code == 0) {
+                //                         layer.msg(info, {time: 3000, icon: 1});
+                //                         var tmp =MANETsNodes[i].id;
+                //                         var deleteNode ="#nodeList div"+fid
+                //                         $(deleteNode).remove();
+                //                         $("#"+MANET.MANET_SSID).append(MANETsNodes[i].str);
+                //                         MANETsNodes = new Array();
+                //                         Update=2;
+                //                         layui.table.reload('node_table'); //重载表格
+                //                     } else {
+                //                         layer.open({
+                //                             title: 'CANNOT JOIN!'
+                //                             , content: data.msg
+                //                         });
+                //                         return;
+                //                     }
+                //                 });
+                //                 // layer.msg(info, {time: 3000, icon: 1});
+                //                 break;
+                //             }
+                //         }
+                //         break;
+                //     }
+                // }
+            }
+        });
+    }
+    function LoadMANETsAndNodes(){
+        var url = "/node/manet/queryAll"
+        ajaxGet(url,"", function (data) {
+            if (data.code == 0) {
+                var str ='';
+                $.each(data.data,function(i,item){
+                    var range = '';
+                    switch (item.manet_range){
+                        case 80:
+                            range ='width: 80px;height: 80px;'
+                            break;
+                        case 150:
+                            range ='width: 150px;height: 150px;'
+                            break;
+                        case 200:
+                            range ='width: 200px;height: 200px;'
+                            break;
+                        case 220:
+                            range ='width: 220px;height: 220px;'
+                            break;
+                        case 250:
+                            range ='width: 250px;height: 250px;'
+                            break;
+                    }
+                    str +='<div style="'+StyleList.pop()+range+'" ondblclick="showMANETDetail(this)" class="MANET_range" id="'+item.manet_SSID+'">\n' ;
+                    var str2 ='';
+                    var ids = new Array();
+                    $.each(item.nodeInfos,function(i,node){
+
+                        str2 +='<div  ondblclick="showNodeDetail(this)" id="'+node.id+'" style="width: fit-content;" >\n' +
+                            '                            <img  src="/img/p1.png" />\n' +
+                            '                            <div>'+node.username+'</div>\n' +
+                            '                        </div>';
+                        ids.push(node.id);
+                    });
+                    str +=str2
+                    str += '</div>\n';
+                    MANETsList.push(item);
+                    $("#MANETsList").append(str);
+                    draggable(item.manet_SSID);
+                    for (var i=0; i<ids.length;i++) draggableNode(ids[i]);
+                });
+                var option ="<select   name=\"keyword\" lay-verify=\"required\">";
+                for(var i=0;i<MANETsList.length;i++){
+                    option += "<option value=\""+MANETsList[i].manet_SSID+"\">"+MANETsList[i].manet_SSID+"</option>"
+                }
+                option +=  "</select>";
+                $("#MAENT_select").html(option);
+                layui.form.render('select');
+
+
+            } else {
+                layer.msg(data.msg, {time: 3000, icon: 5});
+                return;
+            }
+        })
+    }
+
+    function showNodeDetail(e){
+        var id = e.id;
+        layer.open({
+            type: 2,
+            closeBtn: 1,
+            title: "view detail",
+            area: ['450px','300px'],
+            btn: ['Close'],
+            content: 'listform/id/'+id,
+            success: function(layero, index){
+                var body = layer.getChildFrame('body', index);
+                var iframeWin = window[layero.find('iframe')[0]['name']]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+
+            }
+        });
+
+    }
+    /*<![CDATA[*/
+    layui.use(['table','form','element'], function(){
+        var element = layui.element;
+        var table = layui.table;
+        var form = layui.form;
+        form.on('submit(Membership_table-search)', function(data){
+            var field = data.field;
+            table.reload('Membership_table', {
+                page:1
+                ,where: field
+            });
+        });
+        form.on('submit(LAY-user-front-search)', function(data){
+            var field = data.field;
+            table.reload('node_table', {
+                page:1
+                ,where: field
+            });
+        });
+
+        table.render({
+            elem: '#Global_IP_table'
+            ,url: '/MANET/Global_IP/queryAll' //模拟接口
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print']
+            ,title: 'IP pool'
+            ,cols: [
+                [
+                    {field: 'id', width: 100, title: 'id', sort: true}
+                    ,{field: 'nodeID', width: 250, title: 'nodeID', sort: true}
+                    ,{field: 'ipAddress', title: 'IP', width: 350}
+                ]
+            ]
+            ,page: true
+            ,limit: 5
+            ,limits: [10, 20, 30, 50, 100,150,200]
+            ,text: 'error'
+        });
+
+        table.render({
+            elem: '#IP_table'
+            ,url: '/MANET/IP/queryAll' //模拟接口
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print']
+            ,title: 'IP pool'
+            ,cols: [
+                [
+                    // {type: 'checkbox', fixed: 'left'}
+                    {field: 'id', width: 100, title: 'id', sort: true}
+                    ,{field: 'nodeID', width: 250, title: 'nodeID', sort: true}
+                    ,{field: 'ipAddress', title: 'IP', width: 350}
+                    ,{field: 'MANET_SSID', title: 'MANET_SSID', width: 200}
+                    ,{field: 'used', title: 'used', width: 180, fixed: 'right'}
+
+                    // ,{title: 'operation', width: 150, align: 'center', fixed: 'right', toolbar: '#table-content-com'}
+                ]
+            ]
+            ,page: true
+            ,limit: 5
+            ,limits: [10, 20, 30, 50, 100,150,200]
+            ,text: 'error'
+        });
+        table.render({
+            elem: '#Membership_table'
+            ,url: '/MANET/membership' //模拟接口
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print']
+            ,title: 'IP pool'
+            ,cols: [
+                [
+                    {field: 'id', width: 100, title: 'id', sort: true}
+                    ,{field: 'ownerID', width: 100, title: 'ownerID', sort: true}
+                    ,{field: 'username', width: 200, title: 'username', sort: true}
+                    ,{field: 'ipAddress', title: 'IP', width: 350}
+                    ,{field: 'MANET_SSID', title: 'MANET_SSID', width: 200}
+                    ,{field: 'used', title: 'used', width: 180, fixed: 'right'}
+                ]
+            ]
+            ,page: true
+            ,limit: 5
+            ,limits: [10, 20, 30, 50, 100,150,200]
+            ,text: 'error'
+        });
+        table.render({
+            elem: '#Broadcast_table'
+            ,url: '/node/broadcast/queryAll' //模拟接口
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print']
+            ,cols: [
+                [
+                    {field: 'id', width: 100, title: 'id', sort: true}
+                    ,{field: 'nodeID', width: 100, title: 'nodeID', sort: true}
+                    ,{field: 'response_time', title: 'response_time', width: 200, sort: true, templet: function (d) {
+                        if(d.response_time==null) return "" ;
+                        var response_time = layui.util.toDateString(d.response_time, "yyyy-MM-dd HH:mm:ss");
+                        return "<label id='" + d.LAY_INDEX + "'  >" + response_time + "</label>";
+                    }}
+                    ,{field: 'MANET_SSID', title: 'MANET_SSID', width: 200}
+                    ,{field: 'status', title: 'status', width: 180, fixed: 'right'}
+                ]
+            ]
+            ,page: true
+            ,limit: 5
+            ,limits: [10, 20, 30, 50, 100,150,200]
+            ,text: 'error'
+        });
+
+        table.render({
+            elem: '#MANET_table'
+            ,url: '/MANET/queryAll' //模拟接口
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print']
+            ,title: 'MANETs List'
+            ,cols: [
+                [
+                    {type: 'checkbox', fixed: 'left'}
+                    ,{field: 'MANET_SSID', width: 150, title: 'MANET_SSID', sort: true}
+                    ,{field: 'ownerID', title: 'ownerID', minWidth: 100}
+                    ,{field: 'capacity', title: 'capacity', minWidth: 100, sort: true}
+                    ,{field: 'MANET_range', title: 'MANET_range', minWidth: 100, sort: true}
+                    ,{field: 'number', title: 'number', width: 100}
+                    ,{field: 'createTime', title: 'createTime', minWidth: 100, templet: function (d) {
+                        if(d.createTime==null) return "" ;
+                        var createTime = layui.util.toDateString(d.createTime, "yyyy-MM-dd HH:mm:ss");
+                        return "<label id='" + d.LAY_INDEX + "'  >" + createTime + "</label>";
+                    }}
+                    ,{title: 'operation', width: 150, align: 'center', fixed: 'right', toolbar: '#table-content-com'}
+                ]
+            ]
+            ,page: true
+            ,limit: 30
+            ,limits: [10, 20, 30, 50, 100,150,200]
+            ,text: 'error'
+        });
+        table.render({
+            elem: '#node_table'
+            ,url: '/node/queryAll' //模拟接口
+            ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            ,defaultToolbar: ['filter', 'exports', 'print']
+            ,title: 'Nodes List'
+            ,cols: [
+                [
+                    {type: 'checkbox', fixed: 'left'}
+                    ,{field: 'id', width: 100, title: 'id', sort: true}
+                    ,{field: 'username', title: 'username', width: 100}
+                    ,{field: 'category', title: 'device type', width: 130}
+                    ,{field: 'MANET_SSID', title: 'MANET_SSID', width: 150}
+                    ,{field: 'loginTime', title: 'loginTime', width: 180, sort: true, templet: function (d) {
+                        if(d.loginTime==null) return "" ;
+                        var loginTime = layui.util.toDateString(d.loginTime, "yyyy-MM-dd HH:mm:ss");
+                        return "<label id='" + d.LAY_INDEX + "'  >" + loginTime + "</label>";
+                    }}
+                    ,{field: 'registerTime', title: 'registerTime', width: 180, sort: true, templet: function (d) {
+                        if(d.registerTime==null) return "" ;
+                        var registerTime = layui.util.toDateString(d.registerTime, "yyyy-MM-dd HH:mm:ss");
+                        return "<label id='" + d.LAY_INDEX + "'  >" + registerTime + "</label>";
+                    }}
+                    ,{field: 'node_role', title: 'role', width: 100, sort: true}
+                    ,{field: 'status', title: 'status', width: 100, sort: true}
+                    ,{title: 'operation', width: 350, align: 'center', fixed: 'right', toolbar: '#table-content-com'}
+                ]
+            ]
+            ,page: true
+            ,limit: 30
+            ,limits: [10, 20, 30, 50, 100,150,200]
+            ,text: 'none'
+        });
+
+
+
+
+
+        table.on('tool(node_table)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.prompt({
+                    formType: 1
+                    ,title: 'Sensitive operation, please verify password'
+                }, function(value, index){
+                    layer.close(index);
+                    layer.confirm('Really delete it?', function(index){
+                        var ids=new Array(),jsonData={};
+                        ids.push(data.id);
+                        jsonData["ids"] = ids;
+                        jsonData["code"] = value;
+                        var params = JSON.stringify(jsonData);
+                        var url = "/node/deletes"
+                        ajaxPost(url, params, function (data) {
+                            if (data.code == 0) {
+                                layer.msg(data.msg, {time: 3000, icon: 1});
+
+                            } else {
+                                layer.open({
+                                    title: 'delete fail!'
+                                    ,content:data.msg
+                                });return;
+                            }
+                            layui.table.reload('node_table'); //重载表格
+                            layui.table.reload('MANET_table'); //重载表格
+                            layui.table.reload('IP_table'); //重载表格
+                            layui.table.reload('Global_IP_table'); //重载表格
+                            layui.table.reload('Membership_table'); //重载表格
+                        });
+                        layer.close(index);
+                    });
+                });
+            }  else  if(obj.event === 'logout') {
+                layer.confirm('Are you sure to log out?', function (index) {
+                    var jsonData = {};
+                    jsonData["id"] = data.id;
+                    jsonData["username"] = data.username;
+                    var params = JSON.stringify(jsonData);
+                    var url = "/node/logout/username/"+data.username
+                    ajaxGet(url, function (data) {
+                        if (data.code == 0) {
+                            layer.msg(data.msg, {time: 3000, icon: 1});
+                            layui.table.reload('node_table'); //重载表格
+                        } else {
+                            layer.open({
+                                title: 'log out fail!'
+                                , content: data.msg
+                            });
+                            return;
+                        }
+                    });
+                    layer.close(index);
+                });
+            }else  if(obj.event === 'login') {
+                layer.prompt({
+                    formType: 1
+                    ,title: 'please input password'
+                }, function (value, index) {
+                    layer.close(index);
+                    var jsonData = {};
+                    jsonData["username"] = data.username;
+                    jsonData["password"] = value;
+                    var params = JSON.stringify(jsonData);
+                    var url = "/node/login"
+                    ajaxPost(url, params, function (data) {
+                        if (data.code == 0) {
+                            layer.msg(data.msg, {time: 3000, icon: 1});
+                        } else {
+                            layer.open({
+                                title: 'login fail!'
+                                , content: data.msg
+                            });
+                            return;
+                        }
+                        layui.table.reload('node_table'); //重载表格
+                        layui.table.reload('IP_table'); //重载表格
+                        layui.table.reload('Global_IP_table'); //重载表格
+                    });
+                });
+            }else if(obj.event === 'MANET'){
+                layer.open({
+                    type: 1
+                    ,content:"\n" +
+                        "                <div class=\"layui-form\" id=\"formId\" style=\"width: 200px;\">\n" +
+                        "                    <div class=\"layui-form-item\">\n" +
+                        "                        <label class=\"layui-form-label\">Manet range</label>\n" +
+                        "                        <div class=\"layui-input-block\">\n" +
+                        "                            <select id=\"range\"  name=\"range\" lay-verify=\"required\">\n" +
+                        "                                <option value=\"80\">80</option>\n" +
+                        "                                <option value=\"150\">150</option>\n" +
+                        "                                <option value=\"200\">200</option>\n" +
+                        "                                <option value=\"250\">250</option>\n" +
+                        "                            </select>\n" +
+                        "                        </div>\n" +
+                        "                    </div>\n" +
+                        "                    <div class=\"layui-form-item\">\n" +
+                        "                        <label class=\"layui-form-label\">Manet capacity</label>\n" +
+                        "                        <div class=\"layui-input-block\">\n" +
+                        "                            <select id=\"capacity\" name=\"capacity\" lay-verify=\"required\">\n" +
+                        "                                <option value=\"3\">3</option>\n" +
+                        "                                <option value=\"5\">5</option>\n" +
+                        "                                <option value=\"8\">8</option>\n" +
+                        "                            </select>\n" +
+                        "                        </div>\n" +
+                        "                    </div>\n" +
+                        "                </div>\n"
+                    ,btn: ['Create', 'Cancel']
+                    ,area: ["300px", "300px"]
+                    ,zIndex: layer.zIndex
+                    ,title: 'To create a new MANET'
+                    ,success: function (layero) {
+                        form.render('select');
+                    }
+                    ,yes: function(index, value){
+                        var range = top.$('#range').val();
+                        var capacity = top.$('#capacity').val();
+                        layer.close(index);
+                        var jsonData={};
+                        jsonData["MANET_range"] = range;
+                        jsonData["capacity"] = capacity;
+                        jsonData["nodeID"] = data.id;
+                        var url = "/MANET/create"
+                        var params = JSON.stringify(jsonData);
+                        ajaxPost(url, params, function (data) {
+                            if (data.code == 0) {
+                                layer.msg(data.msg, {time: 3000, icon: 1});
+                            } else {
+                                layer.open({
+                                    title: "FAIL"
+                                    , content: data.msg
+                                });
+                                return;
+                            }
+                        });
+                        layui.table.reload('node_table'); //重载表格
+                        layui.table.reload('Membership_table'); //重载表格
+                        layui.table.reload('MANET_table'); //重载表格
+                    }
+                });
+            } else if(obj.event === 'Join'){
+                var option ="";
+                for(var i=0;i<MANETsList.length;i++){
+                    option += "<option value=\""+MANETsList[i].manet_SSID+"\">"+MANETsList[i].manet_SSID+"</option>";
+                }
+                var str = "         <div class=\"layui-form\" id=\"formId\" style=\"width: 400px;\">\n" +
+                    "                    <div class=\"layui-form-item\">\n" +
+                    "                        <label class=\"layui-form-label\">ID</label>\n" +
+                    "                        <div class=\"layui-input-block\">\n" +
+                    "                            <select id=\"MANET_SSID\"  name=\"MANET_SSID\" lay-verify=\"required\">\n" +option+
+                    "                            </select>\n" +
+                    "                        </div>\n" +
+                    "                    </div>\n" +
+                    "                </div>\n"
+                layer.open({
+                    type: 1
+                    ,content: str
+                    ,btn: ['Join', 'Cancel']
+                    ,area: ["400px", "200px"]
+                    ,zIndex: layer.zIndex
+                    ,title: 'Join a MANET'
+                    ,success: function (layero) {
+                        form.render('select');
+                    }
+                    ,yes: function(index, value){
+                        var MANET_SSID = top.$('#MANET_SSID').val();
+                        layer.close(index);
+                        var jsonData={};
+                        jsonData["MANET_SSID"] = MANET_SSID;
+                        jsonData["nodeID"] = data.id;
+                        var url = "/node/join"
+                        var params = JSON.stringify(jsonData);
+                        ajaxPost(url, params, function (data) {
+                            if (data.code == 0) {
+                                layer.msg(data.msg, {time: 3000, icon: 1});
+                            } else {
+                                layer.open({
+                                    title: "FAIL"
+                                    , content: data.msg
+                                });
+                                return;
+                            }
+                        });
+                        layui.table.reload('node_table'); //重载表格
+                        layui.table.reload('Membership_table'); //重载表格
+                        layui.table.reload('MANET_table'); //重载表格
+                        layui.table.reload('IP_table'); //重载表格
+                    }
+
+                });
+            } else  if(obj.event === 'leave') {
+                layer.confirm('Are you sure to leave current MANET?', function (index) {
+                    var jsonData = {};
+                    jsonData["nodeID"] = data.id;
+                    jsonData["MANET_SSID"] = data.MANET_SSID;
+                    var params = JSON.stringify(jsonData);
+                    var url = "/node/leve"
+                    ajaxPost(url, params, function (data) {
+                        if (data.code == 0) {
+                            layer.msg(data.msg, {time: 3000, icon: 1});
+                        } else {
+                            layer.open({
+                                title: 'log out fail!'
+                                , content: data.msg
+                            });
+                            return;
+                        }
+                        layui.table.reload('node_table'); //重载表格
+                        layui.table.reload('Membership_table'); //重载表格
+                        layui.table.reload('MANET_table'); //重载表格
+                        layui.table.reload('IP_table'); //重载表格
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+
+        var active = {
+            batchdel: function () {
+                var checkStatus = table.checkStatus('node_table')
+                    , checkData = checkStatus.data;
+                var ids = new Array(), jsonData = {};
+                if (checkData.length === 0) {
+                    return layer.msg('Please select data');
+                } else {
+                    for (var i = 0; i < checkData.length; i++) {
+                        ids.push(checkData[i].id);
+                    }
+                    jsonData["ids"] = ids;
+                }
+                layer.prompt({
+                    formType: 1
+                    ,title: 'Sensitive operation, please verify password'
+                }, function (value, index) {
+                    layer.close(index);
+                    layer.confirm('Really delete it?', function(index){
+                        layer.close(index);
+                        jsonData["code"] = value;
+                        var url = "/node/deletes"
+                        var params = JSON.stringify(jsonData);
+                        ajaxPost(url, params, function (data) {
+                            if (data.code == 0) {
+                                layer.msg(data.msg, {time: 3000, icon: 1});
+                            } else {
+                                layer.open({
+                                    title: 'del fail!'
+                                    ,content:data.msg
+                                });return;
+                            }
+                        });
+                        layui.table.reload('node_table'); //重载表格
+                        layui.table.reload('MANET_table'); //重载表格
+                        layui.table.reload('IP_table'); //重载表格
+                        layui.table.reload('Global_IP_table'); //重载表格
+                        layui.table.reload('Membership_table'); //重载表格
+                    });
+                });
+            },
+            newNodes: function () {
+                layer.open({
+                     type: 1
+                    ,content:" <div style='padding: 2em' class=\"layui-form\" ><div class=\"layui-form-item\">\n" +
+                            "                <input type=\"text\" id='username' name=\"username\" lay-verify=\"required\" placeholder=\"username\" class=\"layui-input\"/>\n" +
+                            "            </div>" +
+                            " <div class=\"layui-form-item\">\n" +
+                            "                <input type=\"text\" id='password'  name=\"password\"  lay-verify=\"required\" placeholder=\"password\" class=\"layui-input\"/>\n" +
+                            "            </div>" +
+                            " <div class=\"layui-form-item\">\n" +
+                            "            <select id='category' name=\"category\">\n" +
+                            "              <option value=\"car\">car</option>\n" +
+                            "              <option value=\"soldier\">soldier</option>\n" +
+                            "              <option value=\"rescue team\">rescue</option>\n" +
+                            "              <option value=\"tank\">tank</option>\n" +
+                            "              <option value=\"robot\">robot</option>\n" +
+                            "            </select>" +
+                            " </div>" +
+                            " </div>"
+                    ,btn: ['Create', 'Cancel']
+                    ,area: ["300px", "320px"]
+                    ,title: 'To create a new Node'
+                    ,success: function (layero) {
+                        form.render('select');
+                    }
+                    ,yes: function(index, value){
+                        var username = top.$('#username').val();
+                        var password = top.$('#password').val();
+                        var category = top.$('#category').val();
+                        layer.close(index);
+                        var jsonData={};
+                        jsonData["username"] = username;
+                        jsonData["password"] = password;
+                        jsonData["category"] = category;
+                        var url = "/node/register"
+                        var params = JSON.stringify(jsonData);
+                        ajaxPost(url, params, function (data) {
+                            if (data.code == 0) {
+                                layer.msg(data.msg, {time: 3000, icon: 1});
+                            } else {
+                                layer.open({
+                                    title: "FAIL"
+                                    , content: data.msg
+                                });
+                                return;
+                            }
+                        });
+                        layui.table.reload('node_table'); //重载表格
+                        layui.table.reload('Global_IP_table'); //重载表格
+                    }
+
+                });
+            },
+        }
+
+        $('.layui-btn.layuiadmin-btn-list').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    })
+    /*]]>*/
+
+
+    var max = 10;
+    var min = 0;
+    var rand = parseInt(Math.random() * (max - min + 1) + min);
+    function loopChangeArea(){
+        $( "#draggable" ).css("left",rand)
+        $( "#draggable" ).css("right",rand)
+
+    }
+
+
+
+
+</script>
+</html>

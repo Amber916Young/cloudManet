@@ -1,0 +1,26 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yang.cloudmanet.mapper.Lab2Mapper">
+    <insert id="insertResult" parameterType="hashmap">
+        insert into CloudManet.lab2 (execution_time,rounds
+        ,start_time,finish_time,resultArray)
+        values (  #{execution_time},
+                   #{rounds},
+                   #{start_time},
+                   #{finish_time},#{resultArray}
+                   )
+    </insert>
+    <select id="pageQueryData" resultType="java.util.HashMap">
+        select * from CloudManet.lab2
+        limit #{start},#{rows}
+    </select>
+    <select id="pageQueryCount" resultType="java.lang.Integer">
+        select count(*) from CloudManet.lab2
+    </select>
+    <delete id="deletesByid">
+        delete FROM CloudManet.lab2 where id=#{id}
+    </delete>
+
+
+</mapper>

@@ -1,0 +1,149 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yang.cloudmanet.mapper.NodeMapper">
+
+
+    <insert id="registerNode" parameterType="hashmap">
+        insert into CloudManet.NodeInfo (id,username, password, avatar,
+                                        loginTime, position,
+                                        registerTime,status,category)
+        values (
+                #{id},
+                #{username},
+                #{password},
+                #{avatar},
+                #{loginTime},
+                #{position},
+                #{registerTime},
+                #{status},
+                  #{category}
+               )
+    </insert>
+    <insert id="insertBradcast">
+        insert into CloudManet.broadcast (nodeID,
+                                         MANET_SSID,status,response_time)
+        values (
+                   #{nodeID},
+                   #{MANET_SSID},
+                   #{status},
+                   #{response_time}
+               )
+    </insert>
+
+    <update id="updateNodeInfo">
+        update CloudManet.NodeInfo
+        <trim prefix="set" suffixOverrides=",">
+            <if test="status!=null">status=#{status},</if>
+            <if test="category!=null">category=#{category},</if>
+            <if test="loginTime!=null">loginTime=#{loginTime},</if>
+            <if test="ip!=null">ip=#{ip},</if>
+            <if test="node_role!=null">node_role=#{node_role},</if>
+        </trim>
+        where username=#{username} or id=#{id}
+    </update>
+
+    <update id="updateGlobal_pool">
+        update CloudManet.global_IP
+        <trim prefix="set" suffixOverrides=",">
+            <if test="nodeID!=null">nodeID=#{nodeID},</if>
+        </trim>
+        where id=#{id}
+    </update>
+
+
+    <delete id="deleteNodeInfosByid">
+        delete FROM CloudManet.NodeInfo where id=#{id}
+    </delete>
+    <select id="loginNode" resultType="com.yang.cloudmanet.entity.NodeInfo">
+        select * from CloudManet.NodeInfo
+        <where>
+            1=1
+            <if test="username !=null">
+                and username=#{username}
+            </if>
+            <if test="password !=null">
+                and password=#{password}
+            </if>
+        </where>
+    </select>
+    <select id="pageQueryNodeInfoData" resultType="java.util.HashMap">
+        select * from CloudManet.NodeInfo
+        <where>
+            1=1
+            <if test="keyWord !=null">
+                and   concat(
+                IFNULL(username,'')
+                ,IFNULL(category,'')
+                ,IFNULL(position,'')
+                ,IFNULL(status,'')
+                )
+                like concat('%', #{keyWord}, '%')
+            </if>
+        </where>
+        limit #{start},#{rows}
+    </select>
+    <select id="pageQueryNodeInfoCount" resultType="java.lang.Integer">
+        select count(*) from CloudManet.NodeInfo
+        <where>
+            1=1
+            <if test="keyWord !=null">
+                and   concat(
+                IFNULL(username,'')
+                ,IFNULL(category,'')
+                ,IFNULL(position,'')
+                ,IFNULL(status,'')
+                )
+                like concat('%', #{keyWord}, '%')
+            </if>
+        </where>
+    </select>
+    <select id="queryNodeInfo" resultType="com.yang.cloudmanet.entity.NodeInfo">
+        select * from CloudManet.NodeInfo
+        <where>
+            1=1
+            <if test="id != null">
+                and id=#{id}
+            </if>
+            <if test="node_role != null">
+                and node_role=#{node_role}
+            </if>
+        </where>
+    </select>
+    <select id="queryGlobal_pool" resultType="com.yang.cloudmanet.entity.Global_Pool">
+        select * from CloudManet.global_IP where nodeID is null limit 1
+    </select>
+    <select id="queryViewMANETNode" resultType="hashmap">
+        select * from CloudManet.view_manet_node
+        <where>
+            1=1
+            <if test="username !=null">
+                and username=#{username}
+            </if>
+            <if test="password !=null">
+                and password=#{password}
+            </if>
+        </where>
+    </select>
+    <select id="queryViewGlobal_node" resultType="hashmap">
+        select * from CloudManet.view_node_global
+        <where>
+            1=1
+            <if test="username !=null">
+                and username=#{username}
+            </if>
+            <if test="password !=null">
+                and password=#{password}
+            </if>
+        </where>
+    </select>
+    <select id="pageQueryBroadcastCount" resultType="java.lang.Integer">
+        select count(*) from CloudManet.broadcast
+    </select>
+    <select id="pageQueryBroadcastData" resultType="java.util.HashMap">
+        select * from CloudManet.broadcast
+        limit #{start},#{rows}
+    </select>
+
+
+</mapper>

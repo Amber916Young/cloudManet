@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="//unpkg.com/layui@2.6.8/dist/css/layui.css" />
+<div style="padding: 2em">
+  <div class="layui-form-item">
+    <label class="layui-form-label">username</label>
+    <div class="layui-input-inline">
+      <input type="text" name="username" th:value="${nodeInfo?.username}" lay-verify="required" placeholder="username" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">device type</label>
+    <div class="layui-input-inline">
+      <input type="text" name="category"
+             th:value="${nodeInfo?.category}"
+             lay-verify="required" placeholder="category" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">login time</label>
+    <div class="layui-input-inline">
+      <input type="text" name="loginTime" th:value="${nodeInfo?.loginTime}"
+              autocomplete="off" class="layui-input">
+    </div>
+  </div>
+<!--  <div class="layui-form-item">-->
+<!--    <label class="layui-form-label">position</label>-->
+<!--    <div class="layui-input-inline">-->
+<!--      <input type="text" name="position" th:value="${nodeInfo?.position}" lay-verify="required" placeholder="position" autocomplete="off" class="layui-input">-->
+<!--    </div>-->
+<!--  </div>-->
+  <div class="layui-form-item">
+    <label class="layui-form-label">MANET_SSID</label>
+    <div class="layui-input-inline">
+      <input type="text" name="mid" th:value="${nodeInfo?.mid}" lay-verify="required" placeholder="MANET_SSID" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+
+  <div class="layui-form-item">
+    <label class="layui-form-label">Reg time</label>
+    <div class="layui-input-inline">
+      <input type="text" name="registerTime" th:value="${nodeInfo?.registerTime}" lay-verify="required" placeholder="Registration time" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">role</label>
+    <div class="layui-input-inline">
+      <input type="text" name="role" th:value="${nodeInfo?.role}" lay-verify="required" placeholder="role" autocomplete="off" class="layui-input">
+    </div>
+  </div>
+
+
+</div>
+
+  <script src="//unpkg.com/layui@2.6.8/dist/layui.js"/>

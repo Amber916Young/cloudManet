@@ -1,0 +1,228 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yang.cloudmanet.mapper.MANETMapper">
+    <update id="updateMANET">
+        update CloudManet.MANET
+        <trim prefix="set" suffixOverrides=",">
+            <if test="MANET_range!=null">MANET_range=#{MANET_range},</if>
+            <if test="capacity!=null">capacity=#{capacity},</if>
+            <if test="ownerID!=null">ownerID=#{ownerID},</if>
+            <if test="number!=null">number=#{number},</if>
+        </trim>
+        where MANET_SSID=#{MANET_SSID}
+    </update>
+
+
+    <update id="updateDHCPIP">
+        update CloudManet.DHCP_Pool
+        <trim prefix="set" suffixOverrides=",">
+            <if test="MANET_SSID!=null">MANET_SSID=#{MANET_SSID},</if>
+            <if test="used!=null">used=#{used},</if>
+            <if test="nodeID!=''">nodeID=#{nodeID},</if>
+        </trim>
+        where id=#{id} or ipAddress =#{ip} or MANET_SSID=#{MANET_SSID}
+    </update>
+
+
+
+    <update id="updateDHCPIPByMANET">
+        update CloudManet.DHCP_Pool
+        <trim prefix="set" suffixOverrides=",">
+            <if test="MANET_SSID!=null">MANET_SSID=#{MANET_SSID},</if>
+            <if test="nodeID!=null"> nodeID=#{nodeID},</if>
+            <if test="used!=null"> used=#{used},</if>
+        </trim>
+        where id =#{id}
+    </update>
+    <update id="updateDHCPIP2">
+        update CloudManet.DHCP_Pool
+        set MANET_SSID = #{MANET_SSID1}
+        where MANET_SSID =#{MANET_SSID2}
+    </update>
+    <update id="updateNumberMANET">
+        update CloudManet.MANET
+        set number = number-1
+        where MANET_SSID =#{MANET_SSID}
+    </update>
+    <update id="updateGlobal_IP">
+        update CloudManet.global_IP   set nodeID = null
+        where nodeID =#{nodeID}
+    </update>
+
+    <delete id="deleteMANETsByid">
+        delete FROM CloudManet.MANET where MANET_SSID=#{MANET_SSID}
+    </delete>
+
+    <insert id="registerMANET" parameterType="hashmap">
+        insert into CloudManet.MANET (MANET_SSID,MANET_range, ownerID, capacity,createTime,number)
+        values (
+                   #{MANET_SSID},
+                   #{MANET_range},
+                   #{ownerID},
+                   #{capacity},
+                   #{createTime}
+                   ,1)
+    </insert>
+    <insert id="insertDHCP_pool" parameterType="hashmap">
+        insert into CloudManet.DHCP_Pool (ipAddress, MANET_SSID,
+                                          used,nodeID)
+        values (
+                   #{ipAddress},
+                   #{MANET_SSID},
+                   #{used},
+                   #{nodeID}
+
+               )
+    </insert>
+    <insert id="insertGlobalDHCP_pool">
+        insert into CloudManet.global_IP (ipAddress,nodeID)
+        values (
+                   #{ipAddress},
+                   #{nodeID}
+               )
+    </insert>
+
+    <select id="pageQueryMANETsData" resultType="java.util.HashMap">
+        select * from CloudManet.MANET
+        <where>
+            1=1
+            <if test="keyWord !=null">
+                and   concat(
+                IFNULL(MANET_SSID,'')
+                ,IFNULL(ownerID,'')
+                ,IFNULL(capacity,'')
+                ,IFNULL(MANET_range,'')
+                ,IFNULL(location,'')
+                )
+                like concat('%', #{keyWord}, '%')
+            </if>
+        </where>
+        limit #{start},#{rows}
+    </select>
+
+    <select id="pageQueryMANETsCount" resultType="java.lang.Integer">
+        select count(*) from CloudManet.MANET
+        <where>
+            1=1
+            <if test="keyWord !=null">
+                and   concat(
+                 IFNULL(MANET_SSID,'')
+                ,IFNULL(ownerID,'')
+                ,IFNULL(capacity,'')
+                ,IFNULL(MANET_range,'')
+                ,IFNULL(location,''))
+                like concat('%', #{keyWord}, '%')
+            </if>
+        </where>
+    </select>
+    <select id="queryMANETs" resultType="com.yang.cloudmanet.entity.MANETs">
+        select * from CloudManet.MANET
+        <where>
+            1=1
+            <if test="MANET_SSID !=null">
+                and  MANET_SSID = #{MANET_SSID}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryDHCPIP" resultType="com.yang.cloudmanet.entity.DHCP_Pool">
+        select * from CloudManet.DHCP_Pool
+        <where>
+            1=1
+            <if test="used !=null">
+                and  used = #{used}
+            </if>
+            <if test="MANET_SSID !=null">
+                and  MANET_SSID = #{MANET_SSID}
+            </if>
+            <if test="nodeID !=null">
+                or  nodeID = #{nodeID}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+    <select id="queryDHCPIP2" resultType="com.yang.cloudmanet.entity.DHCP_Pool">
+        select * from CloudManet.DHCP_Pool
+        <where>
+            <if test="nodeID !=null">
+                and  nodeID = #{nodeID}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+
+
+    <select id="queryPool" resultType="com.yang.cloudmanet.entity.DHCP_Pool">
+
+    </select>
+    <select id="queryDHCPIPByCapacity" resultType="java.lang.Integer">
+        select * from CloudManet.DHCP_Pool  where  MANET_SSID ='' and used ='0'  limit #{capacity}
+    </select>
+    <select id="queryAllDHCPIP" resultType="com.yang.cloudmanet.entity.DHCP_Pool">
+        select * from CloudManet.DHCP_Pool  where  MANET_SSID !='' and used = #{used} and nodeID is not null
+
+    </select>
+    <select id="queryMembership" resultType="java.util.HashMap">
+        select * from CloudManet.view_manet_node
+        <where>
+            1=1
+            <if test="MANET_SSID !=null">
+                and  MANET_SSID = #{MANET_SSID}
+            </if>
+        </where>
+    </select>
+    <select id="queryAllMAENTs" resultType="com.yang.cloudmanet.entity.MANETs">
+        select * from CloudManet.MANET
+    </select>
+    <select id="queryView_node_MANET" resultType="java.util.HashMap">
+        select * from CloudManet.view_manet_node
+    </select>
+    <select id="pageQueryDHCP_PoolData" resultType="java.util.HashMap">
+        select * from CloudManet.DHCP_Pool limit #{start},#{rows}
+    </select>
+    <select id="pageQueryDHCP_PoolCount" resultType="java.lang.Integer">
+        select count(*) from CloudManet.DHCP_Pool
+    </select>
+    <select id="pageQueryGlobal_IP_PoolData" resultType="java.util.HashMap">
+        select * from CloudManet.DHCP_Pool  limit #{start},#{rows}
+    </select>
+    <select id="pageQueryGlobal_IP_PoolCount" resultType="java.lang.Integer">
+        select count(*) from CloudManet.DHCP_Pool
+    </select>
+    <select id="pageQueryMembershipData" resultType="java.util.HashMap">
+        select * from CloudManet.view_manet_node
+        <where>
+            1=1
+            <if test="keyWord !=null">
+                and   concat(
+                IFNULL(MANET_SSID,''))
+                like concat('%', #{keyWord}, '%')
+            </if>
+        </where>
+        limit #{start},#{rows}
+    </select>
+    <select id="pageQueryMembershipCount" resultType="java.lang.Integer">
+        select count(*) from CloudManet.view_manet_node
+        <where>
+            1=1
+            <if test="keyWord !=null">
+                and   concat(
+                IFNULL(MANET_SSID,''))
+                like concat('%', #{keyWord}, '%')
+            </if>
+        </where>
+    </select>
+    <select id="queryAllDHCPIPByMANETs" resultType="com.yang.cloudmanet.entity.DHCP_Pool">
+        select * from CloudManet.DHCP_Pool
+        where  MANET_SSID = #{MANET_SSID}
+                and  nodeID
+                         not in (select id from CloudManet.view_manet_node where node_role = 'OWNER' )
+
+
+    </select>
+
+
+</mapper>

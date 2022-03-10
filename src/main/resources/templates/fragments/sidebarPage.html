@@ -1,0 +1,35 @@
+<div  th:fragment="sidebarPage"  xmlns:th="http://www.thymeleaf.org">
+  <aside id="sidebar" class="sidebar-nav " style="font-size: 1.2em;">
+    <nav class="sidebar-nav">
+      <ul class="metismenu" id="menu">
+        <li style="height: 2.2em;font-size: 1.3em;line-height: 2.2em;text-align: center">
+          <span class="fa fa-fw fa-dashboard fa-lg"></span>Dashboard
+        </li>
+<!--        <li>-->
+<!--          <a href="###" id="Item1_0"><span class="fa fa-fw fa-desktop fa-lg"></span>monitor</a>-->
+<!--        </li>-->
+        <li class="">
+          <a  href="###" class="has-arrow" id="Item2_0">
+            <span class="fa fa-fw fa-bar-chart fa-lg"></span>
+            Analytics</a>
+          <ul class="mm-collapse">
+              <li><a href="/" id="Item2_1">Home Page</a></li>
+<!--              <li><a href="/" id="Item2_2">Lab2 Page</a></li>-->
+          </ul>
+        </li>
+        <li>
+          <a  href="###" class="has-arrow" id="Item3_0">
+            <span class="fa fa-fw fa-database fa-lg"></span>Database</a>
+          <ul class="mm-collapse">
+            <li><a href="/view/DB/Nodes" id="Item3_1">Nodes</a></li>
+            <li><a href="/view/DB/MANET" id="Item3_2">MANET</a></li>
+            <li><a href="/view/DB/Broadcast" id="Item3_3">Broadcast</a></li>
+            <li><a href="/view/DB/logger" id="Item3_4">Operation Log</a></li>
+          </ul>
+        </li>
+
+
+      </ul>
+    </nav>
+  </aside>
+</div>
